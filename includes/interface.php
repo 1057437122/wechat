@@ -86,7 +86,7 @@ class wecore{
 		$itemStr='';
 		$mediaCount=0;
 		foreach($contentData as $conObj){
-			$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)).'...',$this->getThumbnail($conObj->ID),$conObj->guid);
+			$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)),$this->getThumbnail($conObj->ID),$conObj->guid);
 			$itemStr.=$tmp_itm;
 			$mediaCount++;
 		}
@@ -97,8 +97,8 @@ class wecore{
 	}
 	private function getThumbnail($post_id){
 		$thumbnailUrlArr=wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail');
-		$thumbnailUrl=$thumbnailUrl[0];
-		if(!$thumbnailUrl[3]){
+		$thumbnailUrl=$thumbnailUrlArr[0];
+		if(!$thumbnailUrlArr[3]){
 			$randId=rand(0,9);
 			$thumbnailUrl=plugins_url().'/mywechat/img/'.$randId.'.jpg';
 		}
