@@ -14,8 +14,8 @@ $wechatObj = new wecore($token);
 $valid=$wechatObj->valid();
 
 if($valid){
-	
-	$wechatObj->sendMsg();
+	$wechatObj->respondMsg();
+	// $wechatObj->sendMsg();
 	
 }
 class wecore{
@@ -42,7 +42,92 @@ class wecore{
 		}
 	}
 	private function getData($_keyword){
+		$args=array(
+			'post_type' => 'post',
+			'orderby' => 'date',
+			'post_status' => 'publish',
+			'order'=> 'DESC',
+			'posts_per_page' => -1,
+			'post_content'=>$_keyword,
+		);
+		global $wpdb;
+		$sql="select post_content,post_title,guid from $wpdb->posts where post_content like '%".$_keyword."%' and post_status='publish' and (post_type='page' or post_type='post') order by post_date limit 0,9";
 		
+		$res=$wpdb->get_results( $sql );
+		return $res;
+	}
+	public function respondMsg(){
+		if(IS_DEBUG){
+			$postStr="<xml>
+						<ToUserName><![CDATA[toUser]]></ToUserName>
+						<FromUserName><![CDATA[fromUser]]></FromUserName> 
+						<CreateTime>1348831860</CreateTime>
+						<MsgType><![CDATA[text]]></MsgType>
+						<Content><![CDATA[1]]></Content>
+						<MsgId>1234567890123456</MsgId>
+						</xml>";
+		}else{
+			$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+		}
+		if(!empty($postStr) && $this->checkSignature()){
+			$postObj=simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);//get the object
+			
+			$this->sendPhMsg($postObj->FromUserName,$postObj->ToUserName,$this->getData($postObj->Content)); 
+		}
+	}
+	public function autoReply(){
+		
+	}
+	private function sendPhMsgTest($fromUserName,$toUserName){
+		$headerTpl = "<ToUserName><![CDATA[%s]]></ToUserName>
+			        <FromUserName><![CDATA[%s]]></FromUserName>
+			        <CreateTime>%s</CreateTime>
+			        <MsgType><![CDATA[%s]]></MsgType>
+			        <ArticleCount>%s</ArticleCount>";
+			        
+		$itemTpl=  "<item>
+					<Title><![CDATA[%s]]></Title> 
+					<Description><![CDATA[%s]]></Description>
+					<PicUrl><![CDATA[%s]]></PicUrl>
+					<Url><![CDATA[%s]]></Url>
+					</item>";
+		$time=time();
+		$msgType='news';
+		$headerStr=sprintf($headerTpl,$fromUserName,$toUserName,$time,$msgType,2);
+		$itemStr=sprintf($itemTpl,'nice','what are you doing','http://b264.photo.store.qq.com/psb?/c8feaece-09cc-409b-bb88-5df3183c9d12/e0WlAK*JI1w8m1ai92PonHDI5FBreSByI6b8oJBMsUM!/b/dCvhX53qGgAA&bo=kADiAAAAAAABAFU!&rf=viewer_4','http://www.baidu.com');
+		$itemStr.=$itemStr;
+		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
+		echo $resultStr;
+	}
+	private function sendPhMsg($fromUserName,$toUserName,$contentData){
+		if($contentData==''){
+			return 'em';
+		}
+		
+        $headerTpl = "<ToUserName><![CDATA[%s]]></ToUserName>
+			        <FromUserName><![CDATA[%s]]></FromUserName>
+			        <CreateTime>%s</CreateTime>
+			        <MsgType><![CDATA[%s]]></MsgType>
+			        <ArticleCount>%s</ArticleCount>";
+			        
+		$itemTpl=  "<item>
+					<Title><![CDATA[%s]]></Title> 
+					<Description><![CDATA[%s]]></Description>
+					<PicUrl><![CDATA[%s]]></PicUrl>
+					<Url><![CDATA[%s]]></Url>
+					</item>";
+		$time=time();
+		$itemStr='';
+		$mediaCount=0;
+		foreach($contentData as $conObj){
+			$tmp_itm=sprintf($itemTpl,$conObj->post_title,'tst','http://b264.photo.store.qq.com/psb?/c8feaece-09cc-409b-bb88-5df3183c9d12/e0WlAK*JI1w8m1ai92PonHDI5FBreSByI6b8oJBMsUM!/b/dCvhX53qGgAA&bo=kADiAAAAAAABAFU!&rf=viewer_4',$conObj->guid);
+			$itemStr.=$tmp_itm;
+			$mediaCount++;
+		}
+		$msgType='news';
+		$headerStr = sprintf($headerTpl, $fromUserName, $toUserName, $time, $msgType, $mediaCount);
+		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
+		echo $resultStr;
 	}
 	public function valid(){
 		if(isset($_GET["echostr"])){
@@ -79,5 +164,9 @@ class wecore{
 		}else{
 			return false;
 		}
+	}
+	public function test(){
+		$a=$this->getData('boot');
+		$this->respondMsg('from','to',$a);
 	}
 }
