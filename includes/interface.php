@@ -14,8 +14,8 @@ $wechatObj = new wecore($token);
 $valid=$wechatObj->valid();
 
 if($valid){
-	$wechatObj->test();
-	// $wechatObj->respondMsg();
+	// $wechatObj->test();
+	$wechatObj->respondMsg();
 	// $wechatObj->sendMsg();
 	
 }
@@ -96,8 +96,9 @@ class wecore{
 		echo $resultStr;
 	}
 	private function getThumbnail($post_id){
-		$thumbnailUrl=wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail');
-		if(!$thumbnailUrl){
+		$thumbnailUrlArr=wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail');
+		$thumbnailUrl=$thumbnailUrl[0];
+		if(!$thumbnailUrl[3]){
 			$randId=rand(0,9);
 			$thumbnailUrl=plugins_url().'/mywechat/img/'.$randId.'.jpg';
 		}
