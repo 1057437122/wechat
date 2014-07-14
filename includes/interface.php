@@ -41,21 +41,6 @@ class wecore{
 			echo $resultStr;
 		}
 	}
-	private function getData($_keyword){
-		$args=array(
-			'post_type' => 'post',
-			'orderby' => 'date',
-			'post_status' => 'publish',
-			'order'=> 'DESC',
-			'posts_per_page' => -1,
-			'post_content'=>$_keyword,
-		);
-		global $wpdb;
-		$sql="select post_content,post_title,guid from $wpdb->posts where post_content like '%".$_keyword."%' and post_status='publish' and (post_type='page' or post_type='post') order by post_date limit 0,9";
-		
-		$res=$wpdb->get_results( $sql );
-		return $res;
-	}
 	public function respondMsg(){
 		if(IS_DEBUG){
 			$postStr="<xml>
@@ -78,27 +63,7 @@ class wecore{
 	public function autoReply(){
 		
 	}
-	private function sendPhMsgTest($fromUserName,$toUserName){
-		$headerTpl = "<ToUserName><![CDATA[%s]]></ToUserName>
-			        <FromUserName><![CDATA[%s]]></FromUserName>
-			        <CreateTime>%s</CreateTime>
-			        <MsgType><![CDATA[%s]]></MsgType>
-			        <ArticleCount>%s</ArticleCount>";
-			        
-		$itemTpl=  "<item>
-					<Title><![CDATA[%s]]></Title> 
-					<Description><![CDATA[%s]]></Description>
-					<PicUrl><![CDATA[%s]]></PicUrl>
-					<Url><![CDATA[%s]]></Url>
-					</item>";
-		$time=time();
-		$msgType='news';
-		$headerStr=sprintf($headerTpl,$fromUserName,$toUserName,$time,$msgType,2);
-		$itemStr=sprintf($itemTpl,'nice','what are you doing','http://b264.photo.store.qq.com/psb?/c8feaece-09cc-409b-bb88-5df3183c9d12/e0WlAK*JI1w8m1ai92PonHDI5FBreSByI6b8oJBMsUM!/b/dCvhX53qGgAA&bo=kADiAAAAAAABAFU!&rf=viewer_4','http://www.baidu.com');
-		$itemStr.=$itemStr;
-		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
-		echo $resultStr;
-	}
+	
 	private function sendPhMsg($fromUserName,$toUserName,$contentData){
 		if($contentData==''){
 			return 'em';
@@ -120,7 +85,7 @@ class wecore{
 		$itemStr='';
 		$mediaCount=0;
 		foreach($contentData as $conObj){
-			$tmp_itm=sprintf($itemTpl,$conObj->post_title,'tst','http://b264.photo.store.qq.com/psb?/c8feaece-09cc-409b-bb88-5df3183c9d12/e0WlAK*JI1w8m1ai92PonHDI5FBreSByI6b8oJBMsUM!/b/dCvhX53qGgAA&bo=kADiAAAAAAABAFU!&rf=viewer_4',$conObj->guid);
+			$tmp_itm=sprintf($itemTpl,$conObj->post_title,get_the_excerpt(),$this->getThumbnail($conObj->ID),$conObj->guid);
 			$itemStr.=$tmp_itm;
 			$mediaCount++;
 		}
@@ -128,6 +93,28 @@ class wecore{
 		$headerStr = sprintf($headerTpl, $fromUserName, $toUserName, $time, $msgType, $mediaCount);
 		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
 		echo $resultStr;
+	}
+	private function getThumbnail($post_id){
+		$thumbnailUrl=wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail');
+		if(!$thumbnailUrl){
+			$randId=rand(0,9);
+			$thumbnailUrl=plugins_url().'/mywechat/img/'.$randId.'.jpg';
+		}
+		return $thumbnailUrl;
+	}
+	private function getData($_keyword){
+		$args=array(
+			'post_type' => 'post',
+			'orderby' => 'date',
+			'post_status' => 'publish',
+			'order'=> 'DESC',
+			'posts_per_page' => -1
+		);
+		global $wpdb;
+		$sql="select ID,post_content,post_title,guid from $wpdb->posts where (post_content like '%".$_keyword."%' or post_title like '%".$_keyword."%') and post_status='publish' and (post_type='page' or post_type='post') order by post_date limit 0,9";
+		
+		$res=$wpdb->get_results( $sql );
+		return $res;
 	}
 	public function valid(){
 		if(isset($_GET["echostr"])){
@@ -168,5 +155,26 @@ class wecore{
 	public function test(){
 		$a=$this->getData('boot');
 		$this->respondMsg('from','to',$a);
+	}
+	private function sendPhMsgTest($fromUserName,$toUserName){
+		$headerTpl = "<ToUserName><![CDATA[%s]]></ToUserName>
+			        <FromUserName><![CDATA[%s]]></FromUserName>
+			        <CreateTime>%s</CreateTime>
+			        <MsgType><![CDATA[%s]]></MsgType>
+			        <ArticleCount>%s</ArticleCount>";
+			        
+		$itemTpl=  "<item>
+					<Title><![CDATA[%s]]></Title> 
+					<Description><![CDATA[%s]]></Description>
+					<PicUrl><![CDATA[%s]]></PicUrl>
+					<Url><![CDATA[%s]]></Url>
+					</item>";
+		$time=time();
+		$msgType='news';
+		$headerStr=sprintf($headerTpl,$fromUserName,$toUserName,$time,$msgType,2);
+		$itemStr=sprintf($itemTpl,'nice','what are you doing','http://b264.photo.store.qq.com/psb?/c8feaece-09cc-409b-bb88-5df3183c9d12/e0WlAK*JI1w8m1ai92PonHDI5FBreSByI6b8oJBMsUM!/b/dCvhX53qGgAA&bo=kADiAAAAAAABAFU!&rf=viewer_4','http://www.baidu.com');
+		$itemStr.=$itemStr;
+		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
+		echo $resultStr;
 	}
 }
