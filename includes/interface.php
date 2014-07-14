@@ -14,7 +14,8 @@ $wechatObj = new wecore($token);
 $valid=$wechatObj->valid();
 
 if($valid){
-	$wechatObj->respondMsg();
+	$wechatObj->test();
+	// $wechatObj->respondMsg();
 	// $wechatObj->sendMsg();
 	
 }
@@ -85,7 +86,7 @@ class wecore{
 		$itemStr='';
 		$mediaCount=0;
 		foreach($contentData as $conObj){
-			$tmp_itm=sprintf($itemTpl,$conObj->post_title,get_the_excerpt(),$this->getThumbnail($conObj->ID),$conObj->guid);
+			$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)).'...',$this->getThumbnail($conObj->ID),$conObj->guid);
 			$itemStr.=$tmp_itm;
 			$mediaCount++;
 		}
@@ -153,8 +154,7 @@ class wecore{
 		}
 	}
 	public function test(){
-		$a=$this->getData('boot');
-		$this->respondMsg('from','to',$a);
+		echo $this->getThumbnail(18);
 	}
 	private function sendPhMsgTest($fromUserName,$toUserName){
 		$headerTpl = "<ToUserName><![CDATA[%s]]></ToUserName>
