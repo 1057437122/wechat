@@ -113,7 +113,7 @@ class wecore{
 			'posts_per_page' => -1
 		);
 		global $wpdb;
-		$sql="select ID,post_content,post_title,guid from $wpdb->posts where (post_content like '%".$_keyword."%' or post_title like '%".$_keyword."%') and post_status='publish' and (post_type='page' or post_type='post') order by post_date limit 0,9";
+		$sql="select ID,post_content,post_title,guid from $wpdb->posts where (post_content like '%".trim($_keyword)."%' or post_title like '%".$_keyword."%') and post_status='publish' and (post_type='page' or post_type='post') order by post_date limit 0,9";
 		
 		$res=$wpdb->get_results( $sql );
 		return $res;
