@@ -1,36 +1,17 @@
 <?php 
 /*
 Plugin Name:mywechat
+Plugin URI:http://tech.leepine.com
 Author:Leez
-
+Description: this is used to manage your wechat platform
+Author URI:http://tech.leepine.com
 */
-function checkSignature(){
-		
-	$signature =isset($_GET["signature"])?$_GET["signature"]:'';
-	$timestamp =isset($_GET["timestamp"])?$_GET["timestamp"]:'';
-	$nonce = isset($_GET["nonce"])?$_GET["nonce"]:'';	
-	$token='leepine';		
-	// $token = $this->token;
-	$tmpArr = array($token, $timestamp, $nonce);
-	sort($tmpArr,SORT_STRING);
-	$tmpStr = implode( $tmpArr );
-	$tmpStr = sha1( $tmpStr );
-	
-	if( $tmpStr == $signature ){
-		return true;
-	}else{
-		return false;
-	}
-}
-// $echoStr=isset($_GET['echostr'])?$_GET['echostr']:'';
-// if(checkSignature()){
-	// echo $echoStr;
-	// exit;
-// }
+
 function mywechat_admin(){
 	if(isset($_POST['wechataccess'])){
 		if(wp_verify_nonce($_POST['_wpnonce'],'wechat_admin_option_update')){
 			update_option('wechat_token',stripslashes($_POST['wechat_token']));
+			update_option('wechat_access_url',stripslashes(home_url().'/?'.$_POST['wechat_token']));
 			echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
 		}else{
 			echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
@@ -73,7 +54,10 @@ function wechat_conf_admin_page(){//add menu
 add_action('admin_menu','wechat_conf_admin_page');//add menu
 function wechat_init(){
 	//initialize the wechat configuration
-	$wechat_access_url=home_url().'/?'.dirname(plugin_basename(__FILE__));
+	$wechat_access_url=get_option('wechat_access_url');
+	if(!$wechat_access_url){
+		$wechat_access_url=home_url().'/?'.dirname(plugin_basename(__FILE__));
+	}
 	update_option('wechat_access_url',$wechat_access_url);
 }
 add_action('admin_init','wechat_init');

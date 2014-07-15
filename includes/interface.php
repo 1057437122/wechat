@@ -57,8 +57,17 @@ class wecore{
 		}
 		if(!empty($postStr) && $this->checkSignature()){
 			$postObj=simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);//get the object
-			
-			$this->sendPhMsg($postObj->FromUserName,$postObj->ToUserName,$this->getData($postObj->Content)); 
+			if($postObj->MsgType=='event'){
+				if($postObj->Event=='subscribe'){
+					$subscribePage=get_pages('meta_key=showOnFirstSub&numberposts=10');
+					$leftPostNo=10-count($subscribePage);
+					$subscribePost=get_posts('meta_key=showOnFirstSub&numberposts='.$leftPostNo);
+					$subscribeRe=array_merge($subscribePage,$subscribePost);
+					$this->sendPhMsg($postObj->FromUserName,$postObj->ToUserName,$subscribeRe);
+				}
+			}else{
+				$this->sendPhMsg($postObj->FromUserName,$postObj->ToUserName,$this->getData($postObj->Content)); 
+			}
 		}
 	}
 	public function autoReply(){
@@ -90,9 +99,12 @@ class wecore{
 			$mediaCount=1;
 		}else{
 			foreach($contentData as $conObj){
-				$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)),$this->getThumbnail($conObj->ID),$conObj->guid);
+				$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(strip_tags(substr($conObj->post_content,0,120))),$this->getThumbnail($conObj->ID),$conObj->guid);
 				$itemStr.=$tmp_itm;
 				$mediaCount++;
+				if($mediaCount>=9){
+					break;
+				}
 			}
 		}
 		$msgType='news';
