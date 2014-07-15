@@ -85,10 +85,15 @@ class wecore{
 		$time=time();
 		$itemStr='';
 		$mediaCount=0;
-		foreach($contentData as $conObj){
-			$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)),$this->getThumbnail($conObj->ID),$conObj->guid);
-			$itemStr.=$tmp_itm;
-			$mediaCount++;
+		if(count($contentData)==1 && strlen($contentData[0]->post_content)<1000){//if only one ,just show in one ph message
+			$itemStr=sprintf($itemTpl,$contentData[0]->post_title,$contentData[0]->post_content,$this->getThumbnail($contentData[0]->ID),$contentData[0]->guid);
+			$mediaCount=1;
+		}else{
+			foreach($contentData as $conObj){
+				$tmp_itm=sprintf($itemTpl,$conObj->post_title,trim(substr($conObj->post_content,0,120)),$this->getThumbnail($conObj->ID),$conObj->guid);
+				$itemStr.=$tmp_itm;
+				$mediaCount++;
+			}
 		}
 		$msgType='news';
 		$headerStr = sprintf($headerTpl, $fromUserName, $toUserName, $time, $msgType, $mediaCount);
