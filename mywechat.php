@@ -6,6 +6,7 @@ Author:Leez
 Description: this is used to manage your wechat platform
 Author URI:http://tech.leepine.com
 */
+define(WECHAT_OPTION,'wechat_options');
 
 function mywechat_admin(){
 	if(isset($_POST['wechataccess'])){
@@ -22,7 +23,13 @@ function mywechat_admin(){
 admin setting about wechat
 -->
 <div class="wrap">
+<?php $locations_self_menu = ( isset( $_GET['action'] ) && 'selfMenu' == $_GET['action'] ) ? true : false;?>
+	<h2 class="nav-tab-wrapper">
+		<a href="<?php echo admin_url('admin.php').'?page='.WECHAT_OPTION;?>" class="nav-tab <?php if ( ! isset( $_GET['action'] ) || isset( $_GET['action'] ) && 'selfMenu' != $_GET['action'] ) echo ' nav-tab-active'; ?>"><?php _e('BasicSetting');?></a>
+		<a href="<?php echo esc_url( add_query_arg( array( 'action' => 'selfMenu' ), admin_url( 'admin.php' ).'?page='.WECHAT_OPTION ) ); ?>" class="nav-tab <?php if($locations_self_menu){echo 'nav-tab-active';}?>"><?php _e('selfMenu');?></a>
+	</h2>
 	<?php screen_icon();?>
+	<?php if(!$locations_self_menu):?>
 	<h2>Wechat Configuration</h2>
 	<form action="" method="post" id="wechat_conf_form">
 		<table class="form-table">
@@ -45,11 +52,18 @@ admin setting about wechat
 		<?php wp_nonce_field('wechat_admin_option_update');?>
 		</table>
 	</form>
+	<?php else:?>
+	<h2><?php _e('selfMenuSetting');?></h2>
+	<?php $locations = get_registered_nav_menus();print_r($locations);?>
+	<form action="" method="post" id="wechat_self_menu_conf_form">
+		
+	</form>
+	<?php endif;?>
 </div>
 <?php
 }
 function wechat_conf_admin_page(){//add menu
-	add_menu_page('wechat','wechat setting',9,'wechat_options','mywechat_admin','','4');
+	add_menu_page('wechat','wechat setting',9,WECHAT_OPTION,'mywechat_admin','','4');
 }
 add_action('admin_menu','wechat_conf_admin_page');//add menu
 function wechat_init(){
