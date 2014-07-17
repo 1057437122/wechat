@@ -78,16 +78,29 @@ admin setting about wechat
 	<?php else: //custom menu setting?>
 	<h2><?php _e('Custom Menu Setting');?></h2>
 	<form action="<?php echo esc_url( add_query_arg( array( 'action' => 'customMenu' ), admin_url( 'admin.php' ).'?page='.WECHAT_OPTION ) ); ?>" method="post" id="wechat_custom_menu_id">
-		
+		<div class="custom_menu">
+			<div class="custom_header">
+				<div class="item_title"><?php _e('Custom Menu Manage'); ?></div>
+				<div class="item_op" id="addMenu"><?php _e('Add Main Menu');?></div>
+			</div>
+			<div class="custom_menu_body" id="custom_menu_body">
+				<div class="item_name"><?php _e('Menu Name');?></div>
+				<div class="item_attr"><?php _e('Menu Attribute');?></div>
+				<div class="item_value"><?php _e('Menu Value');?></div>
+			</div>
+		</div>
 	</form>
 
 	<?php endif;?>
 </div>
 <?php
 }
+//json_menu='{"button":[{"type":"click/view","name":"","key/url":"xxxxx"}{"name":"xxxx","sub_button":[{}{}{}]}{}]}'
 function load_mywechat_style(){
 	wp_register_style('mywechat',plugins_url('css/mywechat.css',__FILE__));
 	wp_enqueue_style('mywechat');
+	wp_register_script('mywechat',plugins_url('js/mywechat.js',__FILE__));
+	wp_enqueue_script('mywechat');
 }
 add_action('admin_enqueue_scripts','load_mywechat_style');
 function wechat_conf_admin_page(){//add menu

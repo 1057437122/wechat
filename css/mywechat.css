@@ -1,1 +1,9 @@
-.AApostbox{margin-left:20px;}
+.custom_menu{width:80%;overflow:hidden;background-color:#f4f5f9;}
+.custom_header{height:20px;padding:10px;}
+.item_title{float:left;}
+.item_op{float:left;margin-left:20px;}
+
+.custom_menu_body{background-color:#FFF;overflow:hidden;padding:10px;}
+.item_name{float:left;width:200px;padding:5px 0 5px;}
+.item_attr{float:left;width:200px;padding:5px 0 5px;}
+.item_value{float:left;padding:5px 0 5px;}
