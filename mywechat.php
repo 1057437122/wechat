@@ -81,12 +81,14 @@ admin setting about wechat
 		<div class="custom_menu">
 			<div class="custom_header">
 				<div class="item_title"><?php _e('Custom Menu Manage'); ?></div>
-				<div class="item_op" id="addMenu"><?php _e('Add Main Menu');?></div>
+				<div class="item_op"  id="addMenu"><?php _e('Add Main Menu');?></div>
 			</div>
 			<div class="custom_menu_body" id="custom_menu_body">
-				<div class="item_name"><?php _e('Menu Name');?></div>
-				<div class="item_attr"><?php _e('Menu Attribute');?></div>
-				<div class="item_value"><?php _e('Menu Value');?></div>
+				<div class="item_line">
+					<div class="item_name"><?php _e('Menu Name');?></div>
+					<div class="item_attr"><?php _e('Menu Attribute');?></div>
+					<div class="item_value"><?php _e('Menu Value');?></div>
+				</div>
 			</div>
 		</div>
 	</form>
