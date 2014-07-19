@@ -58,7 +58,7 @@ class wecore{
 		if(!empty($postStr) && $this->checkSignature()){
 			$postObj=simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);//get the object
 			if($postObj->MsgType=='event'){
-				if($postObj->Event=='subscribe'){
+				if($postObj->Event=='subscribe'){//first subscribe
 					$subscribePage=get_pages('meta_key=showOnFirstSub&numberposts=10');
 					$leftPostNo=10-count($subscribePage);
 					$subscribePost=get_posts('meta_key=showOnFirstSub&numberposts='.$leftPostNo);
@@ -112,7 +112,7 @@ class wecore{
 		$resultStr ="<xml>".$headerStr."<Articles>".$itemStr."</Articles></xml>";
 		echo $resultStr;
 	}
-	private function getThumbnail($post_id){
+	private function getThumbnail($post_id){//get the thumbnail if exist else get a random pic under the plugin directory
 		$thumbnailUrlArr=wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'thumbnail');
 		$thumbnailUrl=$thumbnailUrlArr[0];
 		if(!$thumbnailUrlArr[3]){
