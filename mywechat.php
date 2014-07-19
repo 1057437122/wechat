@@ -84,15 +84,21 @@ admin setting about wechat
 				<div class="item_op"  id="addMenu"><?php _e('Add Main Menu');?></div>
 			</div>
 			<div class="custom_menu_body" id="custom_menu_body">
-				<div class="item_line">
+				<div class="item_line" id="line_0">
 					<div class="item_name"><?php _e('Menu Name');?></div>
 					<div class="item_attr"><?php _e('Menu Attribute');?></div>
 					<div class="item_value"><?php _e('Menu Value');?></div>
 				</div>
 			</div>
+		
+		</div>
+		<div class="submit">
+			<input class="button button-primary" type="submit" name="customMenuSettings" value="update options"/>
 		</div>
 	</form>
 
+	
+	
 	<?php endif;?>
 </div>
 <?php
