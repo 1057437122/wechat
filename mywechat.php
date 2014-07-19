@@ -25,6 +25,11 @@ function mywechat_admin(){
 			echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
 		}
 	}
+	if(isset($_GET['action']) && isset($_POST['custommenusettings'])){
+		if(wp_verify_nonce($_POST['_wpnonce'],'wechat_custom_menu_conf')){
+			echo json_encode($_POST['item']);
+		}
+	}
 ?>
 <!--
 admin setting about wechat
@@ -93,8 +98,9 @@ admin setting about wechat
 		
 		</div>
 		<div class="submit">
-			<input class="button button-primary" type="submit" name="customMenuSettings" value="update options"/>
+			<input class="button button-primary" type="submit" name="custommenusettings" value="update options"/>
 		</div>
+		<?php wp_nonce_field('wechat_custom_menu_conf'); ?>
 	</form>
 
 	
