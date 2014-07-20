@@ -20,6 +20,22 @@ function del_item(_id){
 	var $lineId="line_"+_id;
 	jQuery("div[id='"+$lineId+"']").remove();
 }
+function add_item_menu(_id){
+	var $submenuLength=jQuery("#line_"+_id+" .item_line").length;
+	
+	// alert($submenuLength);
+	if($submenuLength<5){
+		var $maxContentId=jQuery('#line_'+_id+'.item_line .item_line').last().attr('id');
+		alert($maxContentId);
+		var $curId=parseInt($maxContentId.substr(12))+1;
+		jQuery("#line_"+_id).append("<div class='clear'></div><div class='item_line' id='line_menu_"+_id+"_"+$curId+"'><div class='item_name' id='name_menu_"+_id+"_"+$curId+"'></div><div class='item_attr' id='attr_menu_"+_id+"_"+$curId+"'><select id='sec_menu_"+_id+"_"+$curId+"' name='item_menu["+_id+"_"+$curId+"][type]'><option name='Button' value='click' selected >Button</option><option name='View' value='view'>View</option></select></div><div class='item_value' id='value_menu_"+_id+"_"+$curId+"'><input type='text' name='item_menu["+_id+"_"+$curId+"][key]'/></div><div class='item_del' id='d_menu_"+_id+"_"+$curId+"' onclick='del_item_menu("+_id+"_"+$curId+")'>DEL</div></div>");
+	}else{
+		alert('max_length');
+	}
+}
+function del_item_menu(_id){
+	
+}
 function menu_sel(_id){
 	var $sel_id="#menu_"+_id;
 	// alert(jQuery(this).val());
@@ -32,5 +48,7 @@ function menu_sel(_id){
 	if($curItem=='Menu'){
 		jQuery('#value_'+_id).remove();
 		jQuery('#d_'+_id).remove();
+		jQuery('#line_'+_id).append("<div class='item_menu_add' id='a_"+_id+"' onclick='add_item_menu("+_id+")'>ADD</div>");
+		jQuery('#line_'+_id).append("<div class='clear'></div><div class='item_line' id='line_menu_"+_id+"_1'><div class='item_name' id='name_menu_"+_id+"_1'></div><div class='item_attr' id='attr_menu_"+_id+"_1'><select id='sec_menu_"+_id+"_1' name='item_menu["+_id+"_1][type]'><option name='Button' value='click' selected >Button</option><option name='View' value='view'>View</option></select></div><div class='item_value' id='value_menu_"+_id+"_1'><input type='text' name='item_menu["+_id+"_1][key]'/></div><div class='item_del' id='d_menu_"+_id+"_1' onclick='del_item_menu("+_id+"_1)'>DEL</div></div>");
 	}
 }
