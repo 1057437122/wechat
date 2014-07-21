@@ -81,16 +81,61 @@ function mywechat_admin(){
 			$ret_json='{"button":[';
 			foreach($_POST['item'] as $items){
 				if($items['type']=='click'){
-					$tmp='{"type":"'.$items['type'].',"name":"'.$items['name'].',"key":"'.$items['key'].'"},';
+					$tmp='{"type":"click","name":"'.$items['name'].',"key":"'.$items['key'].'"},';
+					$ret_json.=$tmp;
+				}elseif($items['type']=='view'){
+					$tmp='{"type":"view","name":"'.$items['name'].'","url:"'.$items['key'].'"},';
+					$ret_json.=$tmp;
+				}else{//type is submenu
+					$subret_json='{"name":"'.$items['name'].'","sub_button":[';
+					foreach($items['submenu'] as $submenuItem){
+						if($submenuItem['type']=='click'){
+							$tmp='{"type":"click","name":"'.$submenuItem['name'].'","key":"'.$submenuItem['key'].'"},';
+							$subret_json.=$tmp;
+						}else{
+							$tmp='{"type":"view","name":"'.$submenuItem['name'].'","key":"'.$submenuItem['key'].'"},';
+							$subret_json.=$tmp;
+						}
+					}
+					$subret_json=substr($subret_json,0,-1);
+					$subret_json.=']}';
+					$ret_json.=$subret_json;
+				}
+				$ret_json=substr($ret_json,0,-1);
+				$ret_json.=']}';
+			}
+			update_option('customMenuItemJson',$ret_json);
+			// echo $ret_json;get the custom menu json_menu
+			// get the access token
+			$customMenuAppid=get_option('custom_menu_appid');
+			$customMenuAppSecret=get_option('custom_menu_appsecret');
+			if(isset($customMenuAppid) && isset($customMenuAppSecret) && !empty($customMenuAppid) && !empty($customMenuAppSecret)){
+				$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$customMenuAppid.'&secret='.$customMenuAppSecret;
+				$html=file_get_contents($getAccessTokenUrl);
+				$html_str=json_decode($html);
+				if(isset($html_str->{'errcode'}){//failure
+					$errorcode=$html_str->{'errmsg'};
+					echo $errorcode;
+					// exit(0);
+				}else{//success
+					$accessToken=$html_str->{'access_token'};
+					$postCustomMenuUrl=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
+					$ch=curl_init();
+					$timeout=5;
+					curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
+					curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+					curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+					$file_contents=curl_exec($ch);
+					curl_close($ch);
+					$retCont=json_decode($file_contents);
+					$errcode=$retCont->{'errcode'};
+					if($errcode==0){
+						echo 'Success';
+					}else{
+						echo 'Failed';
+					}
 				}
 			}
-			print_r($_POST['item']);
-			echo '<br>';
-			var_dump($_POST['item']);
-			echo '<br>';
-			echo json_encode($_POST['item']);
-			echo '<br>';
-			var_dump(json_encode($_POST['item']));
 		}
 	}
 ?>
