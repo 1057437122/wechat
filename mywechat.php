@@ -65,11 +65,14 @@ function mywechat_admin(){
 			update_option('wechat_token',stripslashes($_POST['wechat_token']));
 			update_option('wechat_access_url',stripslashes(home_url().'/?'.$_POST['wechat_token']));
 			if(isset($_POST['enable_custom_menu']) && $_POST['enable_custom_menu']=='enable_custom_menu'){
-				$customMenuAcc=1;
+				update_option('customMenuAcc',1);
+				$customMenuAcc=get_option('customMenuAcc');
 				if(isset($_POST['custom_menu_appid']) && !empty($_POST['custom_menu_appid']) && isset($_POST['custom_menu_appsecret']) && !empty($_POST['custom_menu_appsecret'])){
 					update_option('custom_menu_appid',stripslashes($_POST['custom_menu_appid']));
 					update_option('custom_menu_appsecret',stripslashes($_POST['custom_menu_appsecret']));
 				}
+			}else{
+				update_option('customMenuAcc',0);
 			}
 			echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
 		}else{
@@ -113,7 +116,7 @@ function mywechat_admin(){
 				$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$customMenuAppid.'&secret='.$customMenuAppSecret;
 				$html=file_get_contents($getAccessTokenUrl);
 				$html_str=json_decode($html);
-				if(isset($html_str->{'errcode'}){//failure
+				if(isset($html_str->{'errcode'})){//failure
 					$errorcode=$html_str->{'errmsg'};
 					echo $errorcode;
 					// exit(0);
@@ -162,12 +165,12 @@ admin setting about wechat
 			<th><label for="Wechat_access_url"><?php _e('Url');?></label></th>
 			<td><label><?php echo esc_attr(get_option('wechat_access_url'));?></label></td>
 		</tr>
-		
+		<?php $customMenuAcc=get_option('customMenuAcc'); ?>
 		<tr>
 			<th><input type="checkbox" name="enable_custom_menu" value="enable_custom_menu" <?php if($customMenuAcc){echo 'checked';}?>><?php _e('Enable Custom Menu');?></th>
 		</tr>
 		
-		<?php if(isset($customMenuAcc)): ?>
+		<?php if($customMenuAcc): ?>
 		
 		<tr class="">
 			<th><label for="custom_menu_appid"><?php _e('Custom menu Access');?></label></th>
