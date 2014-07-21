@@ -6,6 +6,57 @@ Author:Leez
 Description: this is used to manage your wechat platform
 Author URI:http://tech.leepine.com
 */
+/*
+
+		Array
+(
+    [1] => Array
+        (
+            [name] => F1
+            [type] => click
+            [key] => 11111
+        )
+
+    [2] => Array
+        (
+            [name] => F2
+            [type] => Menu
+            [submenu] => Array
+                (
+                    [1] => Array
+                        (
+                            [name] => F21
+                            [type] => click
+                            [key] => 21212
+                        )
+
+                    [2] => Array
+                        (
+                            [name] => F22
+                            [type] => click
+                            [key] => 22222
+                        )
+
+                    [3] => Array
+                        (
+                            [name] => F23
+                            [type] => click
+                            [key] => 2323
+                        )
+
+                )
+
+        )
+
+    [3] => Array
+        (
+            [name] => F3
+            [type] => click
+            [key] => 222223333
+        )
+
+)
+*/
 define(WECHAT_OPTION,'wechat_options');
 define(MY_LANG,'leez');
 function mywechat_admin(){
@@ -27,7 +78,19 @@ function mywechat_admin(){
 	}
 	if(isset($_GET['action']) && isset($_POST['custommenusettings'])){
 		if(wp_verify_nonce($_POST['_wpnonce'],'wechat_custom_menu_conf')){
+			$ret_json='{"button":[';
+			foreach($_POST['item'] as $items){
+				if($items['type']=='click'){
+					$tmp='{"type":"'.$items['type'].',"name":"'.$items['name'].',"key":"'.$items['key'].'"},';
+				}
+			}
+			print_r($_POST['item']);
+			echo '<br>';
+			var_dump($_POST['item']);
+			echo '<br>';
 			echo json_encode($_POST['item']);
+			echo '<br>';
+			var_dump(json_encode($_POST['item']));
 		}
 	}
 ?>
