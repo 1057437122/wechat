@@ -6,57 +6,7 @@ Author:Leez
 Description: this is used to manage your wechat platform
 Author URI:http://tech.leepine.com
 */
-/*
 
-		Array
-(
-    [1] => Array
-        (
-            [name] => F1
-            [type] => click
-            [key] => 11111
-        )
-
-    [2] => Array
-        (
-            [name] => F2
-            [type] => Menu
-            [submenu] => Array
-                (
-                    [1] => Array
-                        (
-                            [name] => F21
-                            [type] => click
-                            [key] => 21212
-                        )
-
-                    [2] => Array
-                        (
-                            [name] => F22
-                            [type] => click
-                            [key] => 22222
-                        )
-
-                    [3] => Array
-                        (
-                            [name] => F23
-                            [type] => click
-                            [key] => 2323
-                        )
-
-                )
-
-        )
-
-    [3] => Array
-        (
-            [name] => F3
-            [type] => click
-            [key] => 222223333
-        )
-
-)
-*/
 define(WECHAT_OPTION,'wechat_options');
 define(MY_LANG,'leez');
 function mywechat_admin(){
@@ -110,39 +60,8 @@ function mywechat_admin(){
 			$ret_json.=']}';
 			// echo $ret_json;
 			update_option('customMenuItemJson',$ret_json);
-			// echo $ret_json;get the custom menu json_menu
-			// get the access token
-			$customMenuAppid=get_option('custom_menu_appid');
-			$customMenuAppSecret=get_option('custom_menu_appsecret');
-			if(isset($customMenuAppid) && isset($customMenuAppSecret) && !empty($customMenuAppid) && !empty($customMenuAppSecret)){
-				$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$customMenuAppid.'&secret='.$customMenuAppSecret;
-				$html=file_get_contents($getAccessTokenUrl);
-				$html_str=json_decode($html);
-				if(isset($html_str->{'errcode'})){//failure
-					$errorcode=$html_str->{'errmsg'};
-					echo $errorcode;
-					// exit(0);
-				}else{//success
-					$accessToken=$html_str->{'access_token'};
-					update_option('customMenuAccessToken',$accessToken);
-					$postCustomMenuUrl='https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
-					$ch=curl_init();
-					$timeout=5;
-					curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
-					curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-					curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
-					curl_setopt($ch,CURLOPT_POSTFIELDS,$ret_json);
-					$file_contents=curl_exec($ch);
-					curl_close($ch);
-					$retCont=json_decode($file_contents);
-					$err_code=$retCont->{'errcode'};
-					if($err_code==0){
-						echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
-					}else{
-						echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
-					}
-				}
-			}
+			
+			post_custom_item($ret_json);
 		}
 	}
 ?>
@@ -255,79 +174,114 @@ if($token!='' && isset($_GET[$token])){
 }
 
 function show_custom_menu(){
-$customMenus=get_option('customMenuItemJson');
-$custArr=json_decode($customMenus,true);
+	$customMenus=get_option('customMenuItemJson');
+	$custArr=json_decode($customMenus,true);
 
-$id=1;//start from 1 for the first line
-
-foreach($custArr['button'] as $menus){
-	if(isset($menus['sub_button'])){
-		
-		echo '<div class="item_line" id="line_'.$id.'">
-				<div class="item_name" id="name_'.$id.'">
-					<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
-				</div>
-				<div class="item_attr" id="attr_'.$id.'">
-					<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
-						<option name="Menu" value="Menu" selected>Menu</option>
-						<option name="Button" value="click">Button</option>
-						<option name="View" value="view">View</option>
-					</select>
-				</div>
-				<div class="item_menu_add" id="a_'.$id.'" onclick="add_item_menu('.$id.')">ADD</div>';//header of the submenu
-		$countSub=0;
-		foreach($menus['sub_button'] as $submenu){
-			echo '<div class="clear"></div>
-				<div class="item_line_m" style="margin-left:20px;" id="line_menu_'.$id.'_'.$countSub.'">
-					<div class="item_name" id="name_menu_'.$id.'_'.$countSub.'">
-						<input type="text" name="item['.$id.'][submenu]['.$countSub.'][name]" value="'.$submenu['name'].'" >
-					</div>
-					<div class="item_attr" id="attr_menu_'.$id.'_'.$countSub.'">
-						<select id="sec_menu_'.$id.'_'.$countSub.'" name="item['.$id.'][submenu]['.$countSub.'][type]">
-							<option name="Button" value="click"';
-							if($submenu['type']=='click'){echo 'selected';}
-							echo '>Button</option>
-							<option name="View" value="view"';
-							if($submenu['type']=='view'){echo 'selected';}
-							echo '>View</option>
-						</select>
-					</div>
-					<div class="item_value" id="value_menu_'.$id.'_'.$countSub.'">
-						<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="';
-						if($submenu['type']=='click'){echo $submenu['key'];}
-						else{echo $submenu['url'];}
-						echo '">
-					</div>
-					<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
-				</div><!--item_line_m-->';
-			$countSub+=1;
+	$id=1;//start from 1 for the first line
+	if(isset($custArr['button']) && is_array($custArr['button'])){
+		foreach($custArr['button'] as $menus){
+			if(isset($menus['sub_button'])){
+				
+				echo '<div class="item_line" id="line_'.$id.'">
+						<div class="item_name" id="name_'.$id.'">
+							<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
+						</div>
+						<div class="item_attr" id="attr_'.$id.'">
+							<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
+								<option name="Menu" value="Menu" selected>Menu</option>
+								<option name="Button" value="click">Button</option>
+								<option name="View" value="view">View</option>
+							</select>
+						</div>
+						<div class="item_menu_add" id="a_'.$id.'" onclick="add_item_menu('.$id.')">ADD</div>
+						<div id="line_submenu_'.$id.'"';//header of the submenu
+				$countSub=0;
+				foreach($menus['sub_button'] as $submenu){
+					echo '<div class="clear"></div>
+						<div class="item_line_m" style="margin-left:20px;" id="line_menu_'.$id.'_'.$countSub.'">
+							<div class="item_name" id="name_menu_'.$id.'_'.$countSub.'">
+								<input type="text" name="item['.$id.'][submenu]['.$countSub.'][name]" value="'.$submenu['name'].'" >
+							</div>
+							<div class="item_attr" id="attr_menu_'.$id.'_'.$countSub.'">
+								<select id="sec_menu_'.$id.'_'.$countSub.'" name="item['.$id.'][submenu]['.$countSub.'][type]">
+									<option name="Button" value="click"';
+									if($submenu['type']=='click'){echo 'selected';}
+									echo '>Button</option>
+									<option name="View" value="view"';
+									if($submenu['type']=='view'){echo 'selected';}
+									echo '>View</option>
+								</select>
+							</div>
+							<div class="item_value" id="value_menu_'.$id.'_'.$countSub.'">
+								<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="';
+								if($submenu['type']=='click'){echo $submenu['key'];}
+								else{echo $submenu['url'];}
+								echo '">
+							</div>
+							<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
+						</div><!--item_line_m-->';
+					$countSub+=1;
+				}
+				echo '</div><!--#line submenu--></div><!--item line -->';
+			}else{//ordinary menu
+				echo '<div class="item_line" id="line_'.$id.'">
+						<div class="item_name" id="name_'.$id.'">
+							<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
+						</div>
+						<div class="item_attr" id="attr_'.$id.'">
+							<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
+								<option name="Menu" value="Menu">Menu</option>
+								<option name="Button" value="click"';
+								if($menus['type']=='click'){echo 'selected';}
+								echo '>Button</option>
+								<option name="View" value="view" ';
+								if($menus['type']=='view'){echo 'selected';}
+								echo '>View</option>
+							</select>
+						</div>
+						<div class="item_value" id="value_'.$id.'">
+							<input type="text" name="item['.$id.'][key]" value="';
+							if($menus['type']=='view'){echo $menus['url'];}
+							else{echo $menus['key'];}
+							echo '"/>
+						</div>
+						<div class="item_del" id="d_'.$id.'" onclick="del_item('.$id.')">DEL</div>
+					</div>';
+			}
+			$id+=1;
+		}//foreach
+	}//if set button
+}//
+function post_custom_item($data){
+	$customMenuAppid=get_option('custom_menu_appid');
+	$customMenuAppSecret=get_option('custom_menu_appsecret');
+	if(isset($customMenuAppid) && isset($customMenuAppSecret) && !empty($customMenuAppid) && !empty($customMenuAppSecret)){
+		$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$customMenuAppid.'&secret='.$customMenuAppSecret;
+		$html=file_get_contents($getAccessTokenUrl);
+		$html_str=json_decode($html);
+		if(isset($html_str->{'errcode'})){//failure
+			$errorcode=$html_str->{'errmsg'};
+			echo $errorcode;
+			// exit(0);
+		}else{//success
+			$accessToken=$html_str->{'access_token'};
+			update_option('customMenuAccessToken',$accessToken);
+			$postCustomMenuUrl='https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
+			$ch=curl_init();
+			$timeout=5;
+			curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+			curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+			curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+			$file_contents=curl_exec($ch);
+			curl_close($ch);
+			$retCont=json_decode($file_contents);
+			$err_code=$retCont->{'errcode'};
+			if($err_code==0){
+				echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
+			}else{
+				echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
+			}
 		}
-		echo '</div>';
-	}else{//ordinary menu
-		echo '<div class="item_line" id="line_'.$id.'">
-				<div class="item_name" id="name_'.$id.'">
-					<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
-				</div>
-				<div class="item_attr" id="attr_'.$id.'">
-					<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
-						<option name="Menu" value="Menu">Menu</option>
-						<option name="Button" value="click"';
-						if($menus['type']=='click'){echo 'selected';}
-						echo '>Button</option>
-						<option name="View" value="view" ';
-						if($menus['type']=='view'){echo 'selected';}
-						echo '>View</option>
-					</select>
-				</div>
-				<div class="item_value" id="value_'.$id.'">
-					<input type="text" name="item['.$id.'][key]" value="';
-					if($menus['type']=='view'){echo $menus['url'];}
-					else{echo $menus['key'];}
-					echo '"/>
-				</div>
-				<div class="item_del" id="d_'.$id.'" onclick="del_item('.$id.')">DEL</div>
-			</div>';
 	}
-	$id+=1;
-}//foreach
-}
+}//post_custom_item
