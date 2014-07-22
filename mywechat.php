@@ -96,7 +96,7 @@ function mywechat_admin(){
 							$tmp='{"type":"click","name":"'.$submenuItem['name'].'","key":"'.$submenuItem['key'].'"},';
 							$subret_json.=$tmp;
 						}else{
-							$tmp='{"type":"view","name":"'.$submenuItem['name'].'","key":"'.$submenuItem['key'].'"},';
+							$tmp='{"type":"view","name":"'.$submenuItem['name'].'","url":"'.$submenuItem['key'].'"},';
 							$subret_json.=$tmp;
 						}
 					}
@@ -125,7 +125,7 @@ function mywechat_admin(){
 				}else{//success
 					$accessToken=$html_str->{'access_token'};
 					update_option('customMenuAccessToken',$accessToken);
-					$postCustomMenuUrl=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
+					$postCustomMenuUrl='https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
 					$ch=curl_init();
 					$timeout=5;
 					curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
