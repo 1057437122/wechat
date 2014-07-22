@@ -124,6 +124,7 @@ function mywechat_admin(){
 					// exit(0);
 				}else{//success
 					$accessToken=$html_str->{'access_token'};
+					update_option('customMenuAccessToken',$accessToken);
 					$postCustomMenuUrl=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
 					$ch=curl_init();
 					$timeout=5;
@@ -238,10 +239,10 @@ admin setting about wechat
 										<div class="item_attr" id="attr_menu_'.$id.'_'.$countSub.'">
 											<select id="sec_menu_'.$id.'_'.$countSub.'" name="item['.$id.'][submenu]['.$countSub.'][type]">
 												<option name="Button" value="click"';
-												if($submenu[$countSub]['type']=='click'){echo 'selected';}
+												if($submenu['type']=='click'){echo 'selected';}
 												echo '>Button</option>
 												<option name="View" value="view"';
-												if($submenu[$countSub]['type']=='view'){echo 'selected';}
+												if($submenu['type']=='view'){echo 'selected';}
 												echo '>View</option>
 											</select>
 										</div>
