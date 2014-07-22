@@ -136,9 +136,9 @@ function mywechat_admin(){
 					$retCont=json_decode($file_contents);
 					$errcode=$retCont->{'errcode'};
 					if($errcode==0){
-						echo 'Success';
+						echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
 					}else{
-						echo 'Failed';
+						echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
 					}
 				}
 			}
@@ -261,12 +261,19 @@ admin setting about wechat
 									<div class="item_attr" id="attr_'.$id.'">
 										<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
 											<option name="Menu" value="Menu">Menu</option>
-											<option name="Button" value="click">Button</option>
-											<option name="View" value="view">View</option>
+											<option name="Button" value="click"';
+											if($menus['type']=='click'){echo 'selected';}
+											echo '>Button</option>
+											<option name="View" value="view" ';
+											if($menus['type']=='view'){echo 'selected';}
+											echo '>View</option>
 										</select>
 									</div>
 									<div class="item_value" id="value_'.$id.'">
-										<input type="text" name="item['.$id.'][key]" value="'.$menus['key'].'"/>
+										<input type="text" name="item['.$id.'][key]" value="';
+										if($menus['type']=='view'){echo $menus['url'];}
+										else{echo $menus['key'];}
+										echo '"/>
 									</div>
 									<div class="item_del" id="d_'.$id.'" onclick="del_item('.$id.')">DEL</div>
 								</div>';
