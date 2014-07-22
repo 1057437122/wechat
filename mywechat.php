@@ -135,8 +135,8 @@ function mywechat_admin(){
 					$file_contents=curl_exec($ch);
 					curl_close($ch);
 					$retCont=json_decode($file_contents);
-					$errcode=$retCont->{'errcode'};
-					if($errcode==0){
+					$err_code=$retCont->{'errcode'};
+					if($err_code==0){
 						echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
 					}else{
 						echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
@@ -209,81 +209,7 @@ admin setting about wechat
 					<div class="item_attr"><?php _e('Menu Attribute');?></div>
 					<div class="item_value"><?php _e('Menu Value');?></div>
 				</div>
-				<?php $customMenus=get_option('customMenuItemJson');
-					$custArr=json_decode($customMenus,true);
-
-					$id=1;//start from 1 for the first line
-					
-					foreach($custArr['button'] as $menus){
-						if(isset($menus['sub_button'])){
-							
-							echo '<div class="item_line" id="line_'.$id.'">
-									<div class="item_name" id="name_'.$id.'">
-										<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
-									</div>
-									<div class="item_attr" id="attr_'.$id.'">
-										<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
-											<option name="Menu" value="Menu" selected>Menu</option>
-											<option name="Button" value="click">Button</option>
-											<option name="View" value="view">View</option>
-										</select>
-									</div>
-									<div class="item_menu_add" id="a_'.$id.'" onclick="add_item_menu('.$id.')">ADD</div>';//header of the submenu
-							$countSub=0;
-							foreach($menus['sub_button'] as $submenu){
-								echo '<div class="clear"></div>
-									<div class="item_line_m" style="margin-left:20px;" id="line_menu_'.$id.'_'.$countSub.'">
-										<div class="item_name" id="name_menu_'.$id.'_'.$countSub.'">
-											<input type="text" name="item['.$id.'][submenu]['.$countSub.'][name]" value="'.$submenu['name'].'" >
-										</div>
-										<div class="item_attr" id="attr_menu_'.$id.'_'.$countSub.'">
-											<select id="sec_menu_'.$id.'_'.$countSub.'" name="item['.$id.'][submenu]['.$countSub.'][type]">
-												<option name="Button" value="click"';
-												if($submenu['type']=='click'){echo 'selected';}
-												echo '>Button</option>
-												<option name="View" value="view"';
-												if($submenu['type']=='view'){echo 'selected';}
-												echo '>View</option>
-											</select>
-										</div>
-										<div class="item_value" id="value_menu_'.$id.'_'.$countSub.'">
-											<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="';
-											if($submenu['type']=='click'){echo $submenu['key'];}
-											else{echo $submenu['url'];}
-											echo '">
-										</div>
-										<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
-									</div><!--item_line_m-->';
-								$countSub+=1;
-							}
-							echo '</div>';
-						}else{//ordinary menu
-							echo '<div class="item_line" id="line_'.$id.'">
-									<div class="item_name" id="name_'.$id.'">
-										<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
-									</div>
-									<div class="item_attr" id="attr_'.$id.'">
-										<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
-											<option name="Menu" value="Menu">Menu</option>
-											<option name="Button" value="click"';
-											if($menus['type']=='click'){echo 'selected';}
-											echo '>Button</option>
-											<option name="View" value="view" ';
-											if($menus['type']=='view'){echo 'selected';}
-											echo '>View</option>
-										</select>
-									</div>
-									<div class="item_value" id="value_'.$id.'">
-										<input type="text" name="item['.$id.'][key]" value="';
-										if($menus['type']=='view'){echo $menus['url'];}
-										else{echo $menus['key'];}
-										echo '"/>
-									</div>
-									<div class="item_del" id="d_'.$id.'" onclick="del_item('.$id.')">DEL</div>
-								</div>';
-						}
-						$id+=1;
-					}
+				<?php show_custom_menu();
 				?>
 			</div>
 		
@@ -326,4 +252,82 @@ add_action('admin_init','wechat_init');
 $token=get_option('wechat_token');
 if($token!='' && isset($_GET[$token])){
 	require_once('includes/interface.php');
+}
+
+function show_custom_menu(){
+$customMenus=get_option('customMenuItemJson');
+$custArr=json_decode($customMenus,true);
+
+$id=1;//start from 1 for the first line
+
+foreach($custArr['button'] as $menus){
+	if(isset($menus['sub_button'])){
+		
+		echo '<div class="item_line" id="line_'.$id.'">
+				<div class="item_name" id="name_'.$id.'">
+					<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
+				</div>
+				<div class="item_attr" id="attr_'.$id.'">
+					<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
+						<option name="Menu" value="Menu" selected>Menu</option>
+						<option name="Button" value="click">Button</option>
+						<option name="View" value="view">View</option>
+					</select>
+				</div>
+				<div class="item_menu_add" id="a_'.$id.'" onclick="add_item_menu('.$id.')">ADD</div>';//header of the submenu
+		$countSub=0;
+		foreach($menus['sub_button'] as $submenu){
+			echo '<div class="clear"></div>
+				<div class="item_line_m" style="margin-left:20px;" id="line_menu_'.$id.'_'.$countSub.'">
+					<div class="item_name" id="name_menu_'.$id.'_'.$countSub.'">
+						<input type="text" name="item['.$id.'][submenu]['.$countSub.'][name]" value="'.$submenu['name'].'" >
+					</div>
+					<div class="item_attr" id="attr_menu_'.$id.'_'.$countSub.'">
+						<select id="sec_menu_'.$id.'_'.$countSub.'" name="item['.$id.'][submenu]['.$countSub.'][type]">
+							<option name="Button" value="click"';
+							if($submenu['type']=='click'){echo 'selected';}
+							echo '>Button</option>
+							<option name="View" value="view"';
+							if($submenu['type']=='view'){echo 'selected';}
+							echo '>View</option>
+						</select>
+					</div>
+					<div class="item_value" id="value_menu_'.$id.'_'.$countSub.'">
+						<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="';
+						if($submenu['type']=='click'){echo $submenu['key'];}
+						else{echo $submenu['url'];}
+						echo '">
+					</div>
+					<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
+				</div><!--item_line_m-->';
+			$countSub+=1;
+		}
+		echo '</div>';
+	}else{//ordinary menu
+		echo '<div class="item_line" id="line_'.$id.'">
+				<div class="item_name" id="name_'.$id.'">
+					<input type="text" name="item['.$id.'][name]" value="'.$menus['name'].'"/>
+				</div>
+				<div class="item_attr" id="attr_'.$id.'">
+					<select id="menu_'.$id.'" name="item['.$id.'][type]" onchange="menu_sel('.$id.')">
+						<option name="Menu" value="Menu">Menu</option>
+						<option name="Button" value="click"';
+						if($menus['type']=='click'){echo 'selected';}
+						echo '>Button</option>
+						<option name="View" value="view" ';
+						if($menus['type']=='view'){echo 'selected';}
+						echo '>View</option>
+					</select>
+				</div>
+				<div class="item_value" id="value_'.$id.'">
+					<input type="text" name="item['.$id.'][key]" value="';
+					if($menus['type']=='view'){echo $menus['url'];}
+					else{echo $menus['key'];}
+					echo '"/>
+				</div>
+				<div class="item_del" id="d_'.$id.'" onclick="del_item('.$id.')">DEL</div>
+			</div>';
+	}
+	$id+=1;
+}//foreach
 }
