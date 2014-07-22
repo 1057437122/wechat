@@ -247,7 +247,10 @@ admin setting about wechat
 											</select>
 										</div>
 										<div class="item_value" id="value_menu_'.$id.'_'.$countSub.'">
-											<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="'.$submenu['key'].'">
+											<input type="text" name="item['.$id.'][submenu]['.$countSub.'][key]" value="';
+											if($submenu['type']=='click'){echo $submenu['key'];}
+											else{echo $submenu['url'];}
+											echo '">
 										</div>
 										<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
 									</div><!--item_line_m-->';
