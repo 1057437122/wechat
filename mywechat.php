@@ -87,7 +87,7 @@ function mywechat_admin(){
 					$tmp='{"type":"click","name":"'.$items['name'].'","key":"'.$items['key'].'"},';
 					$ret_json.=$tmp;
 				}elseif($items['type']=='view'){
-					$tmp='{"type":"view","name":"'.$items['name'].'","url:"'.$items['key'].'"},';
+					$tmp='{"type":"view","name":"'.$items['name'].'","url":"'.$items['key'].'"},';
 					$ret_json.=$tmp;
 				}else{//type is submenu
 					$subret_json='{"name":"'.$items['name'].'","sub_button":[';
