@@ -194,7 +194,7 @@ function show_custom_menu(){
 							</select>
 						</div>
 						<div class="item_menu_add" id="a_'.$id.'" onclick="add_item_menu('.$id.')">ADD</div>
-						<div id="line_submenu_'.$id.'"';//header of the submenu
+						<div id="line_submenu_'.$id.'">';//header of the submenu
 				$countSub=0;
 				foreach($menus['sub_button'] as $submenu){
 					echo '<div class="clear"></div>
@@ -252,36 +252,48 @@ function show_custom_menu(){
 		}//foreach
 	}//if set button
 }//
-function post_custom_item($data){
+function get_access_token(&$accessToken,&$retCode,&$errmsg=''){
+	$accessToken='';$retCode=-1;$errmsg='no configuration found';
 	$customMenuAppid=get_option('custom_menu_appid');
 	$customMenuAppSecret=get_option('custom_menu_appsecret');
 	if(isset($customMenuAppid) && isset($customMenuAppSecret) && !empty($customMenuAppid) && !empty($customMenuAppSecret)){
 		$getAccessTokenUrl='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$customMenuAppid.'&secret='.$customMenuAppSecret;
 		$html=file_get_contents($getAccessTokenUrl);
 		$html_str=json_decode($html);
-		if(isset($html_str->{'errcode'})){//failure
-			$errorcode=$html_str->{'errmsg'};
-			echo $errorcode;
-			// exit(0);
-		}else{//success
-			$accessToken=$html_str->{'access_token'};
-			update_option('customMenuAccessToken',$accessToken);
-			$postCustomMenuUrl='https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
-			$ch=curl_init();
-			$timeout=5;
-			curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
-			curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-			curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
-			curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
-			$file_contents=curl_exec($ch);
-			curl_close($ch);
-			$retCont=json_decode($file_contents);
-			$err_code=$retCont->{'errcode'};
-			if($err_code==0){
-				echo '<div class="updated"><p>'.__('Success!You changes were successfully saved').'</p></div>';
-			}else{
-				echo '<div class="error"><p>'.__('Whoops...').'</p></div>';
-			}
+		if(isset($html_str->{'errcode'})){
+			$retCode=$html_str->{'errcode'};
+			$errmsg=$html_str->{'errmsg'};
+			return false;
 		}
+		$accessToken=$html_str->{'access_token'};
+		$retCode=0;
+		return true;
+	}
+	return false;
+}//get access token
+function post_custom_item($data){
+	$accessToken='';
+	$retcode=0;
+	$errmsg='';
+	if(get_access_token($accessToken,$retcode,$errmsg)){
+		update_option('customMenuAccessToken',$accessToken);
+		$postCustomMenuUrl='https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$accessToken;
+		$ch=curl_init();
+		$timeout=5;
+		curl_setopt($ch,CURLOPT_URL,$postCustomMenuUrl);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+		$file_contents=curl_exec($ch);
+		curl_close($ch);
+		$retCont=json_decode($file_contents);
+		$err_code=$retCont->{'errcode'};
+		if($retCont->{'errcode'}==0 && $retCont->{'errmsg'}=='ok'){
+			echo '<div class="updated"><p>'.__('Success!You changes were successfully saved,return msg:').$retCont->{'errmsg'}.'</p></div>';
+		}else{
+			echo '<div class="error"><p>'.__('Whoops..something must be wrong..like:').$retCont->{'errmsg'}.'</p></div>';
+		}
+	}else{
+		echo '<div class="error"><p>'.__('Fail to get Access Token:').$errmsg.'</p></div>';
 	}
 }//post_custom_item
