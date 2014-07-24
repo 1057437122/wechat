@@ -174,13 +174,15 @@ if($token!='' && isset($_GET[$token])){
 }
 
 function show_custom_menu(){
+	//temp set here
+	get_custom_online();
 	$customMenus=get_option('customMenuItemJson');
-	$custArr=json_decode($customMenus,true);
-
+	$custArrAll=json_decode($customMenus,true);
+	$custArr=$custArrAll['menu'];
 	$id=1;//start from 1 for the first line
 	if(isset($custArr['button']) && is_array($custArr['button'])){
 		foreach($custArr['button'] as $menus){
-			if(isset($menus['sub_button'])){
+			if(isset($menus['sub_button']) && !empty($menus['sub_button'])){
 				
 				echo '<div class="item_line" id="line_'.$id.'">
 						<div class="item_name" id="name_'.$id.'">
@@ -297,3 +299,23 @@ function post_custom_item($data){
 		echo '<div class="error"><p>'.__('Fail to get Access Token:').$errmsg.'</p></div>';
 	}
 }//post_custom_item
+function get_custom_online(){
+	$accessToken='';
+	$retcode=0;
+	$errmsg='';
+	if(get_access_token($accessToken,$retcode,$errmsg)){
+		//get the online custome menu json data
+		$url='https://api.weixin.qq.com/cgi-bin/menu/get?access_token='.$accessToken;
+		$html=file_get_contents($url);
+		$html_str=json_decode($html);
+		if(isset($html_str->{'errcode'}) && $html_str->{'errcode'}!=0 ){
+			echo '<div class="error"><p>'.__('Fail to get Custom Menu:').$html_str->{'errmsg'}.'</p></div>';
+		}else{
+			update_option('customMenuItemJson',$html);
+			return true;
+		}
+	}else{
+		echo '<div class="error"><p>'.__('Fail to get Access Token:').$errmsg.'</p></div>';
+		return false;
+	}
+}
