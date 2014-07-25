@@ -130,7 +130,7 @@ admin setting about wechat
 		<div class="custom_menu">
 			<div class="custom_header">
 				<div class="item_title"><?php _e('Custom Menu Manage'); ?></div>
-				<div class="item_op"  id="addMenu"><button> <?php _e('Add Main Menu');?></button></div>
+				<div class="item_op"  id="addMenu"> <?php _e('Add Main Menu');?></div>
 			
 			</div>
 			<div class="custom_menu_body" id="custom_menu_body">

@@ -1,7 +1,7 @@
 .custom_menu{width:80%;overflow:hidden;background-color:#f4f5f9;}
 .custom_header{height:20px;padding:10px;}
 .item_title{float:left;}
-.item_op{float:left;margin-left:20px;overflow:hidden;}
+.item_op{float:left;margin-left:20px;overflow:hidden;cursor:pointer;}
 .item_op a{text-decoration:none;}
 button{cursor:pointer;}
 .item_line{overflow:hidden;}
