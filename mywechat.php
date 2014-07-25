@@ -32,6 +32,9 @@ function mywechat_admin(){
 	if(isset($_GET['refresh']) && $_GET['refresh'] ){
 		get_custom_online();
 	}
+	// if(isset($_GET['refresh'])){
+		// get_custom_online();
+	// }
 	if(isset($_GET['action']) && isset($_POST['custommenusettings'])){
 		
 		if(wp_verify_nonce($_POST['_wpnonce'],'wechat_custom_menu_conf')){
@@ -121,12 +124,14 @@ admin setting about wechat
 	<?php else: //custom menu setting?>
 	<h2><?php _e('Custom Menu Setting');?></h2>	
 	
+	<div class="" id="refresh_custom_menu"  ><button><?php _e('Refresh Custom Menu'); ?></button></div>
+	
 	<form action="<?php echo esc_url( add_query_arg( array( 'action' => 'customMenu' ), admin_url( 'admin.php' ).'?page='.WECHAT_OPTION ) ); ?>" method="post" id="wechat_custom_menu_id">
 		<div class="custom_menu">
 			<div class="custom_header">
 				<div class="item_title"><?php _e('Custom Menu Manage'); ?></div>
 				<div class="item_op"  id="addMenu"><button> <?php _e('Add Main Menu');?></button></div>
-				<div class="item_op" id="refresh_custom_menu"><button><?php _e('Refresh Custom Menu'); ?></button></div>
+			
 			</div>
 			<div class="custom_menu_body" id="custom_menu_body">
 				<div class="item_line" id="line_0">

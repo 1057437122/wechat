@@ -15,10 +15,20 @@ jQuery(document).ready(function(){
 		}
 	});
 	jQuery('#refresh_custom_menu').click(function(){
+		// jQuery.post("admin.php",{"refresh":"true"},function(data,status){alert("Data:"+data+"\nStatus:"+status);});
 		jQuery.ajax({
 			type:"get",
 			url:"admin.php",
-			data:'page=wechat_options&action=customMenu&refresh=true'
+			data:"page=wechat_options&action=customMenu&refresh=true",
+			// data:"{'page':'wechat_options','action':'customMenu','refresh':'true'}",
+			success:function(){
+				alert('success');
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				alert(XMLHttpRequest.status);
+				alert(XMLHttpRequest.readyState);
+				alert(textStatus);
+			}
 		});
 	});
 
