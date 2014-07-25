@@ -14,6 +14,13 @@ jQuery(document).ready(function(){
 			alert('max length');
 		}
 	});
+	jQuery('#refresh_custom_menu').click(function(){
+		jQuery.ajax({
+			type:"get",
+			url:"admin.php",
+			data:'page=wechat_options&action=customMenu&refresh=true'
+		});
+	});
 
 });
 function del_item(_id){
