@@ -124,7 +124,7 @@ admin setting about wechat
 	<?php else: //custom menu setting?>
 	<h2><?php _e('Custom Menu Setting');?></h2>	
 	
-	<div class="" id="refresh_custom_menu"  ><button><?php _e('Refresh Custom Menu'); ?></button></div>
+	<div class="" onclick="refresh_custom_menu('<?php echo WECHAT_OPTION.'\',\'customMenu\'';?>)"  ><button><?php _e('Refresh Custom Menu'); ?></button></div>
 	
 	<form action="<?php echo esc_url( add_query_arg( array( 'action' => 'customMenu' ), admin_url( 'admin.php' ).'?page='.WECHAT_OPTION ) ); ?>" method="post" id="wechat_custom_menu_id">
 		<div class="custom_menu">

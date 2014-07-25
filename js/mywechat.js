@@ -14,25 +14,24 @@ jQuery(document).ready(function(){
 			alert('max length');
 		}
 	});
-	jQuery('#refresh_custom_menu').click(function(){
-		// jQuery.post("admin.php",{"refresh":"true"},function(data,status){alert("Data:"+data+"\nStatus:"+status);});
-		jQuery.ajax({
-			type:"get",
-			url:"admin.php",
-			data:"page=wechat_options&action=customMenu&refresh=true",
-			// data:"{'page':'wechat_options','action':'customMenu','refresh':'true'}",
-			success:function(){
-				alert('success');
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				alert(XMLHttpRequest.status);
-				alert(XMLHttpRequest.readyState);
-				alert(textStatus);
-			}
-		});
-	});
 
 });
+function refresh_custom_menu(_page,_act){
+	jQuery.ajax({
+		type:"get",
+		url:"admin.php",
+		data:"page="+_page+"&action="+_act+"&refresh=true",
+		success:function(data){
+			alert('success!');
+			window.location.reload();
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			alert(XMLHttpRequest.status);
+			alert(XMLHttpRequest.readyState);
+			alert(textStatus);
+		}
+	});
+}
 function del_item(_id){
 	var $lineId="line_"+_id;
 	jQuery("div[id='"+$lineId+"']").remove();
