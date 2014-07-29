@@ -229,7 +229,7 @@ function show_custom_menu(){
 								else{echo $submenu['url'];}
 								echo '">
 							</div>
-							<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu("'.$id.'_'.$countSub.'")">DEL</div>
+							<div class="item_del" id="d_menu_'.$id.'_'.$countSub.'" onclick="del_item_menu(\''.$id.'_'.$countSub.'\')">DEL</div>
 						</div><!--item_line_m-->';
 					$countSub+=1;
 				}
