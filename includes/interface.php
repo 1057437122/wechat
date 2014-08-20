@@ -98,7 +98,7 @@ class wecore{
 			$itemStr=sprintf($itemTpl,$contentData[0]->post_title,$contentData[0]->post_content,$this->getThumbnail($contentData[0]->ID),$contentData[0]->guid);
 			$mediaCount=1;
 		}elseif(empty($contentData) || empty($contentData[0])){
-			$itemStr=sprintf($itemTpl,'Nothing~','没有找到搜索内容，请重新输入关键词！',$this->getThumbnail(0),'');
+			$itemStr=sprintf($itemTpl,'什么也没找到~','对不起，您要搜索的内容没有被检索到，重新搜索一下吧，您可以试着把词缩短一点点~~~',$this->getThumbnail(0),'');
 			$mediaCount=1;
 		}else{
 			foreach($contentData as $conObj){
