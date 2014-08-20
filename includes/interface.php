@@ -98,7 +98,7 @@ class wecore{
 			$itemStr=sprintf($itemTpl,$contentData[0]->post_title,$contentData[0]->post_content,$this->getThumbnail($contentData[0]->ID),$contentData[0]->guid);
 			$mediaCount=1;
 		}elseif(empty($contentData) || empty($contentData[0])){
-			$itemStr=sprintf($itemTpl,'Nothing~','Ã»ÓÐÕÒµ½ËÑË÷ÄÚÈÝ£¬ÇëÖØÐÂÊäÈë¹Ø¼ü´Ê£¡',$this->getThumbnail(0),'');
+			$itemStr=sprintf($itemTpl,'Nothing~','æ²¡æœ‰æ‰¾åˆ°æœç´¢å†…å®¹ï¼Œè¯·é‡æ–°è¾“å…¥å…³é”®è¯ï¼',$this->getThumbnail(0),'');
 			$mediaCount=1;
 		}else{
 			foreach($contentData as $conObj){
